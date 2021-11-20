@@ -15,6 +15,7 @@ namespace CelebAppClient
 {
     public partial class FrmCelebrities : Form
     {
+        Dictionary<int, CelebrityItem> _celebs;
         public FrmCelebrities()
         {
             InitializeComponent();
@@ -22,7 +23,7 @@ namespace CelebAppClient
 
         private void FrmCelebrities_Load(object sender, EventArgs e)
         {
-            LoadDgv();
+            LoadCelebs();
         }
 
         /// <summary>
@@ -32,15 +33,14 @@ namespace CelebAppClient
         /// <returns></returns>
         private Dictionary<int, CelebrityItem> LoadFromApi(bool restoreAll = false)
         {
-
             try
             {
-                return CelebApi.LoadFromApi();
+                return CelebApi.LoadFromApi(restoreAll);
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"There was an error while trying to fetch from api: {ex.Message}", "Error", MessageBoxButtons.OK);
-                return new Dictionary<int, CelebrityItem>();
+                return _celebs;
             }
         }
 
@@ -49,11 +49,11 @@ namespace CelebAppClient
         /// </summary>
         /// <param name="restoreAll">if restore all it means we want all the original db as it was initiated, 
         /// else means take our db (after deletion and so)</param>
-        private void LoadDgv(bool restoreAll = false)
+        private void FromDictToCelebDgv(Dictionary<int, CelebrityItem> _celebs)
         {
-            Dictionary<int, CelebrityItem> celebs = LoadFromApi(restoreAll);
+
             dgvCeleberities.Rows.Clear();
-            foreach (CelebrityItem celeb in celebs.Values)
+            foreach (CelebrityItem celeb in _celebs.Values)
             {
                 int index = dgvCeleberities.Rows.Add();
                 var row = dgvCeleberities.Rows[index];
@@ -79,7 +79,7 @@ namespace CelebAppClient
             Bitmap retval = new Bitmap(responseStream);
             return new Bitmap(retval, new Size(retval.Width / 4, retval.Height / 4));
         }
-        
+
         /// <summary>
         /// deletes celebrity only if there is chosen 1
         /// </summary>
@@ -134,8 +134,8 @@ namespace CelebAppClient
         {
             try
             {
-                CelebApi.RestartDatabaseFromWebApi();
-                LoadDgv(restoreAll: true);
+                var dict = CelebApi.RestartDatabaseFromWebApi();
+                FromDictToCelebDgv(dict);
             }
             catch (Exception ex)
             {
@@ -150,7 +150,23 @@ namespace CelebAppClient
         /// <param name="e"></param>
         private void btnLoadFromLocal_Click(object sender, EventArgs e)
         {
-            LoadDgv(restoreAll: true);
+            LoadCelebs();
+        }
+
+        /// <summary>
+        /// loads celebs from db and place them in dgv
+        /// </summary>
+        private void LoadCelebs()
+        {
+            try
+            {
+                var dict = CelebApi.LoadFromApi(restoreAll: true);
+                FromDictToCelebDgv(dict);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"There was an error while trying to relaod from api: {ex.Message}", "Error", MessageBoxButtons.OK);
+            }
         }
     }
 }
