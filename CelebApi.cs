@@ -11,11 +11,12 @@ namespace CelebAppClient
 {
     public static class CelebApi
     {
+        const string API_URL = "http://localhost:56181/api/Celeb";
         private static Dictionary<int, CelebrityItem> GetCeleb(string command)
         {
             using (var client = new WebClient())
             {
-                var responseString = client.DownloadString($"http://localhost:56181/api/Celeb/{command}");
+                var responseString = client.DownloadString($"{API_URL}/{command}");
                 var result = JsonConvert.DeserializeObject<Dictionary<int, CelebrityItem>>(responseString);
                 return result;
             }
@@ -38,11 +39,10 @@ namespace CelebAppClient
                 var data = new NameValueCollection();
                 data.Add("CelebrityId", celebrityItem.Id.ToString());
                 wb.Headers.Add(HttpRequestHeader.ContentType, "application/x-www-form-urlencoded");
-                Uri uri = new Uri("http://localhost:56181/api/Celeb/Delete");
+                Uri uri = new Uri($"{API_URL}/Delete");
                 var response = wb.UploadValues(uri, "POST", data);
                 string responseInString = Encoding.UTF8.GetString(response);
-                // making sure delete worked
-                return Convert.ToInt32(responseInString);
+                return Convert.ToInt32(responseInString); // return the id of succeded delete id
             }
         }
     }

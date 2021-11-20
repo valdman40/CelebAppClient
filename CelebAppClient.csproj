@@ -52,6 +52,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CelebApi.cs" />
     <Compile Include="CelebrityItem.cs" />
     <Compile Include="FrmCelebrities.cs">
       <SubType>Form</SubType>
