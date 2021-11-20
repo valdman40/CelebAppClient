@@ -150,17 +150,17 @@ namespace CelebAppClient
         /// <param name="e"></param>
         private void btnLoadFromLocal_Click(object sender, EventArgs e)
         {
-            LoadCelebs();
+            LoadCelebs(restoreAll: true);
         }
 
         /// <summary>
         /// loads celebs from db and place them in dgv
         /// </summary>
-        private void LoadCelebs()
+        private void LoadCelebs(bool restoreAll = false)
         {
             try
             {
-                var dict = CelebApi.LoadFromApi(restoreAll: true);
+                var dict = CelebApi.LoadFromApi(restoreAll);
                 FromDictToCelebDgv(dict);
             }
             catch (Exception ex)
